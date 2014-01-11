@@ -5,7 +5,7 @@
 import wiringpi2 as wiringpi
 import time
 import threading
-
+from subprocess import call
 
 class movement(threading.Thread):
 	accel = 10
@@ -63,28 +63,33 @@ stepper1.started = True
 stepper2.started = True
 stepper1.start()
 stepper2.start()
-denominator = ""
+direction =""
+denominator = 1.0
+call(["sudo killall servod"],shell=True)
+call(["sudo ./servod"],shell=True)
 
-while (denominator !=0):
+
+while (direction !="quit"):
 	for x in stepper1.motor:
 		wiringpi.digitalWrite(x,0)
 	for x in stepper2.motor:
 		wiringpi.digitalWrite(x,0)
-	try:
-		denominator = input("speed?(number, 0 exit) ")
-	except NameError:
-		print "only numbers"
+	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/quit) ")
+	if direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="pu" and direction !="pd" and direction !="quit":
+		print "only fd,bk,lt,rt,pu,pd,quit"
 		continue
-	if denominator != 0:
-		direction = raw_input("direction?(fd/bk/lt/rt) ")
-		if direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt":
-			print "only fd,bk,lt and rt"
-			continue
-		try:
-			duration = input("duration?(seconds) ")
-		except NameError:
-			print "only numbers"
-			continue
+	if direction != "quit":
+		if direction != "pu" and direction !="pd":
+			try:
+				denominator = input("speed?(number, 0 exit) ")
+			except NameError:
+				print "only numbers"
+				continue
+			try:
+				duration = input("duration?(seconds) ")
+			except NameError:
+				print "only numbers"
+				continue
 		if direction == "bk":
 			stepper1.avanti = True
 			stepper2.avanti = True
@@ -97,6 +102,12 @@ while (denominator !=0):
 		elif direction == "rt":
 			stepper1.avanti = False
 			stepper2.avanti = True
+		elif direction == "pu":
+			call(["echo 0=90 > /dev/servoblaster"],shell=True)
+			duration = 0
+		elif direction == "pd":
+			call(["echo 0=160 > /dev/servoblaster"],shell=True)
+			duration = 0
 		speed = 1.0/denominator
 		time.sleep (0.5)
 		stepper1.ix = 0
@@ -110,5 +121,6 @@ while (denominator !=0):
 		stepper2.go = False
 	else:
 		print "exit"
+		call(["sudo killall servod"],shell=True)
 		stepper1.started = False
 		stepper2.started = False
