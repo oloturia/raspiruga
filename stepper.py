@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 #pin 11,10,6,5 motore 1
 #pin 14,13,12,3 motore 2
 
@@ -10,6 +10,7 @@ from subprocess import call
 class movement(threading.Thread):
 	accel = 10
 	realspeed = 0.1
+	speedwheel = 0.1
 	decremento = 0.1
 	go = False
 	started = False
@@ -17,7 +18,7 @@ class movement(threading.Thread):
 	def run(self):
 		while self.started:
 			if self.go:
-				self.decremento = (self.realspeed-speed)/self.accel
+				self.decremento = (self.realspeed-self.speedwheel)/self.accel
 				wiringpi.digitalWrite(self.motor[self.ix],1)
 				self.px = self.ix
 				if self.avanti:
@@ -32,10 +33,10 @@ class movement(threading.Thread):
 				wiringpi.digitalWrite(self.motor[self.ix],1)
 				time.sleep(self.realspeed)
 				wiringpi.digitalWrite(self.motor[self.px],0)
-				if self.realspeed > speed:
+				if self.realspeed > self.speedwheel:
 					self.realspeed -= self.decremento
 				else:
-					self.realspeed = speed
+					self.realspeed = self.speedwheel
 			else:
 				for x in self.motor:
 					wiringpi.digitalWrite(x,0)
@@ -63,6 +64,8 @@ stepper1.started = True
 stepper2.started = True
 stepper1.start()
 stepper2.start()
+rw = 1.0
+lw = 1.0
 direction =""
 denominator = 1.0
 call(["sudo killall servod"],shell=True)
@@ -74,12 +77,12 @@ while (direction !="quit"):
 		wiringpi.digitalWrite(x,0)
 	for x in stepper2.motor:
 		wiringpi.digitalWrite(x,0)
-	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/quit) ")
-	if direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="pu" and direction !="pd" and direction !="quit":
+	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/ad/quit) ")
+	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="pu" and direction !="pd" and direction !="quit":
 		print "only fd,bk,lt,rt,pu,pd,quit"
 		continue
 	if direction != "quit":
-		if direction != "pu" and direction !="pd":
+		if direction != "pu" and direction !="pd" and direction !="ad":
 			try:
 				denominator = input("speed?(number, 0 exit) ")
 			except NameError:
@@ -93,27 +96,56 @@ while (direction !="quit"):
 		if direction == "bk":
 			stepper1.avanti = True
 			stepper2.avanti = True
+			rw = lw = 1.0/denominator
 		elif direction == "fd":
 			stepper1.avanti = False
 			stepper2.avanti = False
-		elif direction == "lt":
+			rw = lw = 1.0/denominator
+		elif direction == "rt":
 			stepper1.avanti = True
 			stepper2.avanti = False
-		elif direction == "rt":
+			rw = lw = 1.0/denominator
+		elif direction == "lt":
 			stepper1.avanti = False
 			stepper2.avanti = True
+			rw = lw = 1.0/denominator
 		elif direction == "pu":
 			call(["echo 0=90 > /dev/servoblaster"],shell=True)
 			duration = 0
 		elif direction == "pd":
-			call(["echo 0=160 > /dev/servoblaster"],shell=True)
+			call(["echo 0=158 > /dev/servoblaster"],shell=True)
 			duration = 0
-		speed = 1.0/denominator
+		elif direction == "ad":
+			try:
+				rw = input("right wheel interval? ")
+				dir = input("right wheel direction? (0/1)")
+				if dir == 1:
+					stepper1.avanti = True
+				elif dir == 0:
+					stepper1.avanti = False
+				else:
+					print "0/1 only"
+					continue
+				lw = input("left wheel interval?  ")
+				dir = input("left wheel direction?  (0/1)")
+				if dir == 1:
+					stepper2.avanti = True
+				elif dir == 0:
+					stepper2.avanti = False
+				else:
+					print "0/1 only"
+					continue
+				duration = input("duration? ")
+			except NameError:
+				print "numbers only"
+				continue
 		time.sleep (0.5)
 		stepper1.ix = 0
 		stepper2.ix = 0
 		stepper1.px = 0
 		stepper2.px = 0
+		stepper1.speedwheel = rw
+		stepper2.speedwheel = lw
 		stepper1.go = True
 		stepper2.go = True
 		time.sleep(duration)
