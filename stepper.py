@@ -68,8 +68,8 @@ rw = 1.0
 lw = 1.0
 direction =""
 denominator = 1.0
-call(["sudo killall servod"],shell=True)
-call(["sudo ./servod"],shell=True)
+#call(["sudo killall servod"],shell=True)
+#call(["sudo ./servod"],shell=True)
 
 
 while (direction !="quit"):
@@ -77,12 +77,12 @@ while (direction !="quit"):
 		wiringpi.digitalWrite(x,0)
 	for x in stepper2.motor:
 		wiringpi.digitalWrite(x,0)
-	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/ad/quit) ")
-	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="pu" and direction !="pd" and direction !="quit":
-		print "only fd,bk,lt,rt,pu,pd,quit"
+	direction = raw_input("action?(fd/bk/lt/rt/ad/quit) ")
+	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="quit":
+		print "only fd,bk,lt,rt,quit"
 		continue
 	if direction != "quit":
-		if direction != "pu" and direction !="pd" and direction !="ad":
+		if direction !="ad":
 			try:
 				denominator = input("speed?(number, 0 exit) ")
 			except NameError:
@@ -109,12 +109,12 @@ while (direction !="quit"):
 			stepper1.avanti = False
 			stepper2.avanti = True
 			rw = lw = 1.0/denominator
-		elif direction == "pu":
-			call(["echo 0=90 > /dev/servoblaster"],shell=True)
-			duration = 0
-		elif direction == "pd":
-			call(["echo 0=158 > /dev/servoblaster"],shell=True)
-			duration = 0
+#		elif direction == "pu":
+#			call(["echo 0=100 > /dev/servoblaster"],shell=True)
+#			duration = 0
+#		elif direction == "pd":
+#			call(["echo 0=80 > /dev/servoblaster"],shell=True)
+#			duration = 0
 		elif direction == "ad":
 			try:
 				rw = input("right wheel interval? ")
