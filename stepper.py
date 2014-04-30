@@ -8,17 +8,17 @@ import threading
 from subprocess import call
 
 class movement(threading.Thread):
-	accel = 10
+#	accel = 10
 	realspeed = 0.1
 	speedwheel = 0.1
-	decremento = 0.1
+#	decremento = 0.1
 	go = False
 	started = False
 	avanti = False
 	def run(self):
 		while self.started:
 			if self.go:
-				self.decremento = (self.realspeed-self.speedwheel)/self.accel
+#				self.decremento = (self.realspeed-self.speedwheel)/self.accel
 				wiringpi.digitalWrite(self.motor[self.ix],1)
 				self.px = self.ix
 				if self.avanti:
@@ -34,7 +34,8 @@ class movement(threading.Thread):
 				time.sleep(self.realspeed)
 				wiringpi.digitalWrite(self.motor[self.px],0)
 				if self.realspeed > self.speedwheel:
-					self.realspeed -= self.decremento
+					#self.realspeed -= self.decremento
+					self.realspeed -= 0.01
 				else:
 					self.realspeed = self.speedwheel
 			else:
@@ -68,8 +69,8 @@ rw = 1.0
 lw = 1.0
 direction =""
 denominator = 1.0
-#call(["sudo killall servod"],shell=True)
-#call(["sudo ./servod"],shell=True)
+call(["sudo killall servod"],shell=True)
+call(["sudo ./servod"],shell=True)
 
 
 while (direction !="quit"):
@@ -77,7 +78,7 @@ while (direction !="quit"):
 		wiringpi.digitalWrite(x,0)
 	for x in stepper2.motor:
 		wiringpi.digitalWrite(x,0)
-	direction = raw_input("action?(fd/bk/lt/rt/ad/quit) ")
+	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/ad/quit) ")
 	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="quit":
 		print "only fd,bk,lt,rt,quit"
 		continue
@@ -109,12 +110,12 @@ while (direction !="quit"):
 			stepper1.avanti = False
 			stepper2.avanti = True
 			rw = lw = 1.0/denominator
-#		elif direction == "pu":
-#			call(["echo 0=100 > /dev/servoblaster"],shell=True)
-#			duration = 0
-#		elif direction == "pd":
-#			call(["echo 0=80 > /dev/servoblaster"],shell=True)
-#			duration = 0
+		elif direction == "pu":
+			call(["echo 0=170 > /dev/servoblaster"],shell=True)
+			duration = 0
+		elif direction == "pd":
+			call(["echo 0=185 > /dev/servoblaster"],shell=True)
+			duration = 0
 		elif direction == "ad":
 			try:
 				rw = input("right wheel interval? ")
