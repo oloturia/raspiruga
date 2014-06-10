@@ -79,11 +79,11 @@ while (direction !="quit"):
 	for x in stepper2.motor:
 		wiringpi.digitalWrite(x,0)
 	direction = raw_input("action?(fd/bk/lt/rt/pu/pd/ad/quit) ")
-	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="quit":
+	if direction != "ad" and direction != "fd" and direction != "bk" and direction !="lt" and direction !="rt" and direction !="quit" and direction !="pd" and direction !="pu":
 		print "only fd,bk,lt,rt,quit"
 		continue
 	if direction != "quit":
-		if direction !="ad":
+		if direction !="ad" and direction !="pu" and direction !="pd":
 			try:
 				denominator = input("speed?(number, 0 exit) ")
 			except NameError:
@@ -94,11 +94,11 @@ while (direction !="quit"):
 			except NameError:
 				print "only numbers"
 				continue
-		if direction == "bk":
+		if direction == "fd":
 			stepper1.avanti = True
 			stepper2.avanti = True
 			rw = lw = 1.0/denominator
-		elif direction == "fd":
+		elif direction == "bk":
 			stepper1.avanti = False
 			stepper2.avanti = False
 			rw = lw = 1.0/denominator
@@ -114,7 +114,7 @@ while (direction !="quit"):
 			call(["echo 0=170 > /dev/servoblaster"],shell=True)
 			duration = 0
 		elif direction == "pd":
-			call(["echo 0=185 > /dev/servoblaster"],shell=True)
+			call(["echo 0=190 > /dev/servoblaster"],shell=True)
 			duration = 0
 		elif direction == "ad":
 			try:
