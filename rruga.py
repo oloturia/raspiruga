@@ -72,7 +72,7 @@ lw = 1.0
 direction =""
 denominator = 1.0
 call(["sudo killall servod"],shell=True)
-call(["sudo ./servod"],shell=True)
+call(["sudo /home/pi/PiBits/ServoBlaster/user/servod"],shell=True)
 
 
 while (direction !="quit"):
