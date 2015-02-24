@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#controllo raspiruga
 #pin 11,10,6,5 motore 1
 #pin 14,13,12,3 motore 2
 
