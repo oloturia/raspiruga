@@ -1,5 +1,4 @@
 #!/usr/bin/python
-#controllo raspiruga
 #pin 11,10,6,5 motore 1
 #pin 14,13,12,3 motore 2
 
@@ -61,7 +60,9 @@ stepper1 = movement()
 stepper2 = movement()
 
 stepper1.motor = [10,11,6,5]
-stepper2.motor = [14,13,12,3]
+#stepper1.motor = [5,6,11,10]
+#stepper2.motor = [14,13,12,3]
+stepper2.motor = [3,12,13,14]
 stepper1.go = False
 stepper2.go = False
 stepper1.started = True
@@ -73,7 +74,7 @@ lw = 1.0
 direction =""
 denominator = 1.0
 call(["sudo killall servod"],shell=True)
-call(["sudo /home/pi/PiBits/ServoBlaster/user/servod"],shell=True)
+call(["sudo /home/pi/PiBits/ServoBlaster/user/servod --p1pins=3"],shell=True)
 
 
 while (direction !="quit"):
@@ -115,11 +116,15 @@ while (direction !="quit"):
 			stepper1.avanti = False
 			stepper2.avanti = True
 			rw = lw = 1.0/denominator
-		elif direction == "pu":
-			call(["echo 0=170 > /dev/servoblaster"],shell=True)
-			duration = 0
 		elif direction == "pd":
-			call(["echo 0=190 > /dev/servoblaster"],shell=True)
+			call(["echo 0=210 > /dev/servoblaster"],shell=True)
+			time.sleep(0.5)
+			call(["echo 0=0 > /dev/servoblaster"],shell=True)
+			duration = 0
+		elif direction == "pu":
+			call(["echo 0=120 > /dev/servoblaster"],shell=True)
+			time.sleep(0.5)
+			call(["echo 0=0 > /dev/servoblaster"],shell=True)
 			duration = 0
 		elif direction == "ad":
 			try:
